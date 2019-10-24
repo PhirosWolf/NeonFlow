@@ -34,6 +34,11 @@ NeonFlow.Canvas = class Canvas {
     }
   }
 
+  /* Clears the canvas */
+  clear () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
   /* Draws a tile at the given absolute coordinates with the given size */
   drawTile (tileCodename, x, y, width, height) {
     x = x || 0;
@@ -65,7 +70,7 @@ NeonFlow.Canvas = class Canvas {
     let yOffset = isCameraDefined ? this.camera.y : 0;
     let xScale = isCameraDefined ? this.camera.scaleX : 1;
     let yScale = isCameraDefined ? this.camera.scaleY : 1;
-    this.drawTile(tileCodename, (x || 0) + xOffset, (y || 0) + yOffset, width * xScale, height * yScale);
+    this.drawTile(tileCodename, (x || 0) - xOffset, (y || 0) - yOffset, width * xScale, height * yScale);
   }
 
   /* Draws a block */
@@ -78,8 +83,8 @@ NeonFlow.Canvas = class Canvas {
     let yOffset = isCameraDefined ? this.camera.y : 0;
     let xScale = isCameraDefined ? this.camera.scaleX : 1;
     let yScale = isCameraDefined ? this.camera.scaleY : 1;
-    x = (x || block.x) + xOffset;
-    y = this.canvas.height - (y || block.y) - yOffset;
+    x = (x || block.x) - xOffset;
+    y = this.canvas.height - (y || block.y) + yOffset;
     width = width || block.width;
     height = height || block.width;
     let tile = !blockState ? block.tile : block.states[Math.abs(blockState) - 1];

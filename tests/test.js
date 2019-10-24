@@ -48,9 +48,12 @@ function drawTileset () {
   c.drawTileRelative('test.8', 130, 130);
   let i = 0;
   setInterval(() => {
-    c.drawBlock(`center:${i % 3}`);
+    c.clear();
+    c.drawBlock(`center:${i}`);
     ++i;
-  }, 1000);
+    i %= 3;
+    cam.moveBy(10, 3);
+  }, 50);
 }
 
 load();
