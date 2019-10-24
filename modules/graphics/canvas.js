@@ -5,6 +5,7 @@ NeonFlow.Canvas = class Canvas {
     this.camera = null;
     this.layers = [];
     this.hitRegions = [];
+    this.dontDrawOffsetElements = true;
     this.canvas = document.createElement('canvas');
     this.canvas.width = width || window.innerWidth;
     this.canvas.height = height || window.innerHeight;
@@ -33,12 +34,38 @@ NeonFlow.Canvas = class Canvas {
     }
   }
 
-  /* Draws a tile at the given coordinates with the given size */
+  /* Draws a tile at the given absolute coordinates with the given size */
   drawTile (tileCodename, x, y, width, height) {
+    x = x || 0;
+    y = y || 0;
     let parsedCodename = tileCodename.split('.');
     let tileset = NeonFlow.Tileset.tilesets[parsedCodename[0]];
     let tile = tileset.tiles[parsedCodename[1]];
-    this.ctx.drawImage(tileset.tileset, ...tile, x || 0, y || 0, width || tile[2], height || tile[3]);
+    width = width || tile[2];
+    height = height || tile[3];
+    if (
+      this.dontDrawOffsetElements && !(
+        x + width <= 0 ||
+        y + height <= 0 ||
+        x >= this.canvas.width ||
+        y >= this.canvas.height
+      )
+    ) {
+      let isCameraDefined = this.camera instanceof Object;
+      let xScale = isCameraDefined ? this.camera.scaleX : 1;
+      let yScale = isCameraDefined ? this.camera.scaleY : 1;
+      this.ctx.drawImage(tileset.tileset, ...tile, x, y, width * xScale, height * yScale);
+    }
+  }
+
+  /* Draws a tile at the given relative coordinates with the given size */
+  drawTileRelative (tileCodename, x, y, width, height) {
+    let isCameraDefined = this.camera instanceof Object;
+    let xOffset = isCameraDefined ? this.camera.x : 0;
+    let yOffset = isCameraDefined ? this.camera.y : 0;
+    let xScale = isCameraDefined ? this.camera.scaleX : 1;
+    let yScale = isCameraDefined ? this.camera.scaleY : 1;
+    this.drawTile(tileCodename, (x || 0) + xOffset, (y || 0) + yOffset, width * xScale, height * yScale);
   }
 
   /* Draws a block */
@@ -46,9 +73,17 @@ NeonFlow.Canvas = class Canvas {
     let parsedBlockName = blockName.split(':');
     let blockState = parseInt(parsedBlockName[1] || 0);
     let block = NeonFlow.Block.blocks[parsedBlockName[0]];
+    let isCameraDefined = this.camera instanceof Object;
+    let xOffset = isCameraDefined ? this.camera.x : 0;
+    let yOffset = isCameraDefined ? this.camera.y : 0;
+    let xScale = isCameraDefined ? this.camera.scaleX : 1;
+    let yScale = isCameraDefined ? this.camera.scaleY : 1;
+    x = (x || block.x) + xOffset;
+    y = this.canvas.height - (y || block.y) - yOffset;
+    width = width || block.width;
+    height = height || block.width;
     let tile = !blockState ? block.tile : block.states[Math.abs(blockState) - 1];
-    // change the coordinate system and make this instruction handle the current camera
-    this.drawTile(tile, x || block.x, y || block.y, width || block.width, height || block.height);
+    this.drawTile(tile, x, y, width * xScale, height * yScale);
   }
 
   /* Draws a GUI */
@@ -57,8 +92,8 @@ NeonFlow.Canvas = class Canvas {
   }
 
   /* Sets the current instance of camera that the canvas has to use */
-  setCamera (cam) {
-
+  setCamera (cameraName) {
+    this.camera = NeonFlow.Camera.cameras[cameraName];
   }
 
   /* Adds a layer */

@@ -8,6 +8,7 @@ let NeonFlow = {
   /* List of modules that can be imported */
   'modulesList': [
     'data/block',
+    'data/camera',
     'graphics/canvas',
     'graphics/tileset',
     'toolkits/graphics'
