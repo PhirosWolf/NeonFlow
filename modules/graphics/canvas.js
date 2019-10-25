@@ -56,7 +56,7 @@ NeonFlow.Canvas = class Canvas {
         y >= this.canvas.height
       )
     ) {
-      let isCameraDefined = this.camera instanceof Object;
+      let isCameraDefined = this.camera instanceof NeonFlow.Camera;
       let xScale = isCameraDefined ? this.camera.scaleX : 1;
       let yScale = isCameraDefined ? this.camera.scaleY : 1;
       this.ctx.drawImage(tileset.tileset, ...tile, x, y, width * xScale, height * yScale);
@@ -65,7 +65,7 @@ NeonFlow.Canvas = class Canvas {
 
   /* Draws a tile at the given relative coordinates with the given size */
   drawTileRelative (tileCodename, x, y, width, height) {
-    let isCameraDefined = this.camera instanceof Object;
+    let isCameraDefined = this.camera instanceof NeonFlow.Camera;
     let xOffset = isCameraDefined ? this.camera.x : 0;
     let yOffset = isCameraDefined ? this.camera.y : 0;
     let xScale = isCameraDefined ? this.camera.scaleX : 1;
@@ -78,7 +78,7 @@ NeonFlow.Canvas = class Canvas {
     let parsedBlockName = blockName.split(':');
     let blockState = parseInt(parsedBlockName[1] || 0);
     let block = NeonFlow.Block.blocks[parsedBlockName[0]];
-    let isCameraDefined = this.camera instanceof Object;
+    let isCameraDefined = this.camera instanceof NeonFlow.Camera;
     let xOffset = isCameraDefined ? this.camera.x : 0;
     let yOffset = isCameraDefined ? this.camera.y : 0;
     let xScale = isCameraDefined ? this.camera.scaleX : 1;
@@ -92,13 +92,18 @@ NeonFlow.Canvas = class Canvas {
   }
 
   /* Draws a GUI */
-  drawGUI (gui) {
+  drawGUI (guiName) {
 
   }
 
   /* Sets the current instance of camera that the canvas has to use */
   setCamera (cameraName) {
     this.camera = NeonFlow.Camera.cameras[cameraName];
+  }
+
+  /* Resets camera instance */
+  resetCamera () {
+    this.camera = null;
   }
 
   /* Adds a layer */
@@ -120,4 +125,4 @@ NeonFlow.Canvas = class Canvas {
   removeHitRegions () {
     this.hitRegions = [];
   }
-}
+};

@@ -4,6 +4,10 @@ let c;
 let t;
 let b;
 let cam;
+let mh;
+let hrrect;
+let hrcirc;
+let hrellipse;
 
 function load () {
   document.body.style.margin = 0;
@@ -16,20 +20,46 @@ function load () {
 function main () {
   c = new NeonFlow.Canvas();
   c.addAfterElement();
-  t = new NeonFlow.Tileset('test', './../../tileset-test.png', drawTileset);
+  /*t = new NeonFlow.Tileset('test', './../../tileset-test.png', drawTileset);
   t.setTileSize(50, 50);
   b = new NeonFlow.Block('center', 'test.center');
   b.setCoordinates(Math.floor(c.canvas.width / 2) - 50, Math.floor(c.canvas.height / 2) + 50);
   b.setSize(100, 100);
   b.addState('test.center-right');
-  b.addState('test.center-left');
+  b.addState('test.center-left');*/
   cam = new NeonFlow.Camera('cam');
   cam.moveTo(0, 0);
   c.setCamera('cam');
+
+  mh = new NeonFlow.MouseHandler(c.canvas);
+  hrrect = new NeonFlow.RectHitRegion('hrrect', 10, 10, 70, 70, () => {
+    console.log('rect');
+  });
+  hrrect.setCamera('cam');
+  mh.linkHitRegion('hrrect');
+  c.ctx.strokeRect(10, 10, 70, 70);
+  hrcirc = new NeonFlow.CircHitRegion('hrcirc', 200, 50, 30, () => {
+    console.log('circ');
+  });
+  hrcirc.setCamera('cam');
+  mh.linkHitRegion('hrcirc');
+  c.ctx.beginPath();
+  c.ctx.ellipse(200, 50, 30, 30, 2 * Math.PI, 0, 2 * Math.PI);
+  c.ctx.stroke();
+  c.ctx.closePath();
+  hrellipse = new NeonFlow.EllipseHitRegion('hrellipse', 400, 50, 70, 20, () => {
+    console.log('ellipse');
+  });
+  hrellipse.setCamera('cam');
+  mh.linkHitRegion('hrellipse');
+  c.ctx.beginPath();
+  c.ctx.ellipse(400, 50, 70, 20, 2 * Math.PI, 0, 2 * Math.PI);
+  c.ctx.stroke();
+  c.ctx.closePath();
 }
 
 function drawTileset () {
-  t.includeIncompleteTiles = true;
+  /*t.includeIncompleteTiles = true;
   t.registerTile('center', 25, 25, 50, 50);
   t.setOffset(20, 0);
   t.registerTile('center-right', 25, 25, 50, 50);
@@ -53,7 +83,7 @@ function drawTileset () {
     ++i;
     i %= 3;
     cam.moveBy(10, 3);
-  }, 50);
+  }, 50);*/
 }
 
 load();

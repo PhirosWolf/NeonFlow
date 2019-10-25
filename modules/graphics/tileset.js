@@ -89,6 +89,6 @@ NeonFlow.Tileset = class Tileset {
       this.tiles[name] = [horizontalTiles * width + xOffset, verticalTiles * height + yOffset, this.tileset.width - xOffset - horizontalTiles * width, this.tileset.height - yOffset - verticalTiles * height];
     }
   }
-}
+};
 
 NeonFlow.Tileset.tilesets = {};

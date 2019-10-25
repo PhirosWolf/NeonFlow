@@ -36,6 +36,6 @@ NeonFlow.Block = class Block {
   setState (n, tileCodename) {
     this.states[n] = tileCodename;
   }
-}
+};
 
 NeonFlow.Block.blocks = {};

@@ -1,6 +1,8 @@
 'use strict';
 
 let NeonFlow = {
+  /* NeonFlow's version */
+  'VERSION': '0.0.0',
   /* Path of the directory containing modules */
   'modulesDir': './modules/',
   /* Imported modules */
@@ -9,8 +11,10 @@ let NeonFlow = {
   'modulesList': [
     'data/block',
     'data/camera',
+    'data/hitregion',
     'graphics/canvas',
     'graphics/tileset',
+    'periph/mousehandler',
     'toolkits/graphics'
   ],
   /* Checks if the given array of modules are already imported */
@@ -68,4 +72,4 @@ let NeonFlow = {
       createScript(query);
     }
   }
-}
+};

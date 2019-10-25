@@ -20,6 +20,6 @@ NeonFlow.Camera = class Camera {
     this.x = x;
     this.y = y;
   }
-}
+};
 
 NeonFlow.Camera.cameras = {};
