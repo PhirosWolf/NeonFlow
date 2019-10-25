@@ -8,6 +8,7 @@ let mh;
 let hrrect;
 let hrcirc;
 let hrellipse;
+let gui;
 
 function load () {
   document.body.style.margin = 0;
@@ -20,9 +21,10 @@ function load () {
 function main () {
   c = new NeonFlow.Canvas();
   c.addAfterElement();
-  /*t = new NeonFlow.Tileset('test', './../../tileset-test.png', drawTileset);
+  t = new NeonFlow.Tileset('test', './../../tileset-test.png', drawTileset);
   t.setTileSize(50, 50);
-  b = new NeonFlow.Block('center', 'test.center');
+  drawTileset();
+  /*b = new NeonFlow.Block('center', 'test.center');
   b.setCoordinates(Math.floor(c.canvas.width / 2) - 50, Math.floor(c.canvas.height / 2) + 50);
   b.setSize(100, 100);
   b.addState('test.center-right');
@@ -32,17 +34,18 @@ function main () {
   c.setCamera('cam');
 
   mh = new NeonFlow.MouseHandler(c.canvas);
+  gui = new NeonFlow.GUI('gui', 'test.center', 700, 350);
   hrrect = new NeonFlow.RectHitRegion('hrrect', 10, 10, 70, 70, () => {
     console.log('rect');
   });
   hrrect.setCamera('cam');
-  mh.linkHitRegion('hrrect');
+  // mh.linkHitRegion('hrrect');
   c.ctx.strokeRect(10, 10, 70, 70);
   hrcirc = new NeonFlow.CircHitRegion('hrcirc', 200, 50, 30, () => {
     console.log('circ');
   });
   hrcirc.setCamera('cam');
-  mh.linkHitRegion('hrcirc');
+  // mh.linkHitRegion('hrcirc');
   c.ctx.beginPath();
   c.ctx.ellipse(200, 50, 30, 30, 2 * Math.PI, 0, 2 * Math.PI);
   c.ctx.stroke();
@@ -51,7 +54,7 @@ function main () {
     console.log('ellipse');
   });
   hrellipse.setCamera('cam');
-  mh.linkHitRegion('hrellipse');
+  // mh.linkHitRegion('hrellipse');
   c.ctx.beginPath();
   c.ctx.ellipse(400, 50, 70, 20, 2 * Math.PI, 0, 2 * Math.PI);
   c.ctx.stroke();
@@ -59,9 +62,9 @@ function main () {
 }
 
 function drawTileset () {
-  /*t.includeIncompleteTiles = true;
+  t.includeIncompleteTiles = true;
   t.registerTile('center', 25, 25, 50, 50);
-  t.setOffset(20, 0);
+  /*t.setOffset(20, 0);
   t.registerTile('center-right', 25, 25, 50, 50);
   t.setOffset(-20, 0);
   t.registerTile('center-left', 25, 25, 50, 50);

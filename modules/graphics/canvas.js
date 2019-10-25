@@ -5,6 +5,7 @@ NeonFlow.Canvas = class Canvas {
     this.camera = null;
     this.layers = [];
     this.hitRegions = [];
+    this.guiMouseHandlers = [];
     this.dontDrawOffsetElements = true;
     this.canvas = document.createElement('canvas');
     this.canvas.width = width || window.innerWidth;
@@ -92,8 +93,45 @@ NeonFlow.Canvas = class Canvas {
   }
 
   /* Draws a GUI */
-  drawGUI (guiName) {
+  drawGUI (guiName, x, y, cameraRelative) {
+    cameraRelative = !!cameraRelative;
+    let gui = NeonFlow.GUI.GUIs[guiName];
+    let firstAvailableSpace = this.guiMouseHandlers.findIndex((el) => el === null);
+    let mhTmp = new NeonFlow.MouseHandler(this.canvas, x || 0, y || 0);
+    let mhIndex = 0;
 
+    if (firstAvailableSpace === -1) {
+      mhIndex = this.guiMouseHandlers.push(mhTmp) - 1;
+    } else {
+      this.guiMouseHandlers[firstAvailableSpace] = mhTmp;
+      mhIndex = firstAvailableSpace;
+    }
+    if (cameraRelative) {
+      this.drawTileRelative(gui.tileCodename, x || 0, y || 0, gui.width || undefined, gui.height || undefined);
+      for (let hitRegion of gui.hitRegions) {
+        if (this.camera !== null) {
+          NeonFlow.HitRegion.hitRegions[hitRegion].setCamera(this.camera.name);
+        }
+        mhTmp.linkHitRegion(hitRegion);
+      }
+    } else {
+      this.drawTile(gui.tileCodename, x || 0, y || 0, gui.width || undefined, gui.height || undefined);
+      for (let hitRegion of gui.hitRegions) {
+        mhTmp.linkHitRegion(hitRegion);
+      }
+    }
+
+    return mhIndex;
+  }
+
+  /* Properly exits a GUI */
+  exitGUI (index) {
+    this.guiMouseHandlers[index] = null;
+  }
+
+  /* Properly exits all GUIs */
+  exitGUIs () {
+    this.guiMouseHandlers = [];
   }
 
   /* Sets the current instance of camera that the canvas has to use */
@@ -114,15 +152,5 @@ NeonFlow.Canvas = class Canvas {
   /* Removes all layers */
   removeLayers () {
     this.layers = [];
-  }
-
-  /* Adds a hit region */
-  addHitRegion (hitregion) {
-
-  }
-
-  /* Removes all hit regions */
-  removeHitRegions () {
-    this.hitRegions = [];
   }
 };

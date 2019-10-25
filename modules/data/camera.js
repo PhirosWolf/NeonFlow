@@ -2,6 +2,7 @@
 
 NeonFlow.Camera = class Camera {
   constructor (name) {
+    this.name = name;
     this.x = 0;
     this.y = 0;
     this.scaleX = 1;
