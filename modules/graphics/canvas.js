@@ -126,11 +126,15 @@ NeonFlow.Canvas = class Canvas {
 
   /* Properly exits a GUI */
   exitGUI (index) {
+    this.guiMouseHandlers[index].unlinkHitRegions();
     this.guiMouseHandlers[index] = null;
   }
 
   /* Properly exits all GUIs */
   exitGUIs () {
+    this.guiMouseHandlers.forEach((mh) => {
+      mh.unlinkHitRegions();
+    });
     this.guiMouseHandlers = [];
   }
 

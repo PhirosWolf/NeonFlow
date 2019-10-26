@@ -58,7 +58,7 @@ function then () {
   });
   hrellipse.setCamera('cam');
   // mh.linkHitRegion('hrellipse');
-  c.drawGUI('gui', 50, 10);
+  let guiID = c.drawGUI('gui', 50, 10);
   c.ctx.strokeRect(60, 20, 70, 70);
   c.ctx.beginPath();
   c.ctx.ellipse(250, 60, 30, 30, 2 * Math.PI, 0, 2 * Math.PI);
@@ -68,6 +68,9 @@ function then () {
   c.ctx.ellipse(450, 60, 70, 20, 2 * Math.PI, 0, 2 * Math.PI);
   c.ctx.stroke();
   c.ctx.closePath();
+  setTimeout(() => {
+    c.exitGUI(guiID);
+  }, 5000);
   /*t.setOffset(20, 0);
   t.registerTile('center-right', 25, 25, 50, 50);
   t.setOffset(-20, 0);
