@@ -13,6 +13,7 @@ let NeonFlow = {
     'data/camera',
     'data/hitregion',
     'graphics/canvas',
+    'graphics/gui',
     'graphics/tileset',
     'periph/mousehandler',
     'toolkits/graphics'

@@ -21,9 +21,8 @@ function load () {
 function main () {
   c = new NeonFlow.Canvas();
   c.addAfterElement();
-  t = new NeonFlow.Tileset('test', './../../tileset-test.png', drawTileset);
+  t = new NeonFlow.Tileset('test', './../../tileset-test.png', then);
   t.setTileSize(50, 50);
-  drawTileset();
   /*b = new NeonFlow.Block('center', 'test.center');
   b.setCoordinates(Math.floor(c.canvas.width / 2) - 50, Math.floor(c.canvas.height / 2) + 50);
   b.setSize(100, 100);
@@ -33,37 +32,42 @@ function main () {
   cam.moveTo(0, 0);
   c.setCamera('cam');
 
+
+}
+
+function then () {
+  t.includeIncompleteTiles = true;
+  t.registerTile('center', 25, 25, 50, 50);
   mh = new NeonFlow.MouseHandler(c.canvas);
   gui = new NeonFlow.GUI('gui', 'test.center', 700, 350);
+  gui.addHitRegion('hrrect');
+  gui.addHitRegion('hrcirc');
+  gui.addHitRegion('hrellipse');
   hrrect = new NeonFlow.RectHitRegion('hrrect', 10, 10, 70, 70, () => {
     console.log('rect');
   });
   hrrect.setCamera('cam');
   // mh.linkHitRegion('hrrect');
-  c.ctx.strokeRect(10, 10, 70, 70);
   hrcirc = new NeonFlow.CircHitRegion('hrcirc', 200, 50, 30, () => {
     console.log('circ');
   });
   hrcirc.setCamera('cam');
   // mh.linkHitRegion('hrcirc');
-  c.ctx.beginPath();
-  c.ctx.ellipse(200, 50, 30, 30, 2 * Math.PI, 0, 2 * Math.PI);
-  c.ctx.stroke();
-  c.ctx.closePath();
   hrellipse = new NeonFlow.EllipseHitRegion('hrellipse', 400, 50, 70, 20, () => {
     console.log('ellipse');
   });
   hrellipse.setCamera('cam');
   // mh.linkHitRegion('hrellipse');
+  c.drawGUI('gui', 50, 10);
+  c.ctx.strokeRect(60, 20, 70, 70);
   c.ctx.beginPath();
-  c.ctx.ellipse(400, 50, 70, 20, 2 * Math.PI, 0, 2 * Math.PI);
+  c.ctx.ellipse(250, 60, 30, 30, 2 * Math.PI, 0, 2 * Math.PI);
   c.ctx.stroke();
   c.ctx.closePath();
-}
-
-function drawTileset () {
-  t.includeIncompleteTiles = true;
-  t.registerTile('center', 25, 25, 50, 50);
+  c.ctx.beginPath();
+  c.ctx.ellipse(450, 60, 70, 20, 2 * Math.PI, 0, 2 * Math.PI);
+  c.ctx.stroke();
+  c.ctx.closePath();
   /*t.setOffset(20, 0);
   t.registerTile('center-right', 25, 25, 50, 50);
   t.setOffset(-20, 0);

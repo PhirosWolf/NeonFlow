@@ -31,4 +31,4 @@ NeonFlow.GUI = class GUI {
   }
 };
 
-NeonFLow.GUI.GUIs = {};
+NeonFlow.GUI.GUIs = {};
