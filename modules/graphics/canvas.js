@@ -4,6 +4,8 @@ NeonFlow.Canvas = class Canvas {
   constructor (width, height) {
     this.camera = null;
     this.layers = [];
+    this.sortedLayers = [];
+    this.preSortLayers = true;
     this.hitRegions = [];
     this.guiMouseHandlers = [];
     this.dontDrawOffsetElements = true;
@@ -84,8 +86,8 @@ NeonFlow.Canvas = class Canvas {
     let yOffset = isCameraDefined ? this.camera.y : 0;
     let xScale = isCameraDefined ? this.camera.scaleX : 1;
     let yScale = isCameraDefined ? this.camera.scaleY : 1;
-    x = (x || block.x) - xOffset;
-    y = this.canvas.height - (y || block.y) + yOffset;
+    x = x - xOffset;
+    y = this.canvas.height - y + yOffset;
     width = width || block.width;
     height = height || block.width;
     let tile = !blockState ? block.tile : block.states[Math.abs(blockState) - 1];
@@ -149,12 +151,29 @@ NeonFlow.Canvas = class Canvas {
   }
 
   /* Adds a layer */
-  addLayer (layer) {
+  addLayer (layerName) {
+    this.layers.push(NeonFlow.Layer.layers[layerName]);
+    if (this.preSortLayers) {
+      this.sortedLayers = NeonFlow.Layer.updatePreSort(this.layers);
+    }
+  }
 
+  /* Executes layers actions in order of their layer index */
+  execLayers () {
+    if (this.preSortLayers) {
+      this.sortedLayers.forEach((layer) => {
+        layer.action();
+      });
+    } else {
+      NeonFlow.Layer.updatePreSort(this.layers).forEach((layer) => {
+        layer.action();
+      });
+    }
   }
 
   /* Removes all layers */
   removeLayers () {
     this.layers = [];
+    this.sortedLayers = [];
   }
 };

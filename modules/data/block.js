@@ -1,19 +1,13 @@
 'use strict';
 
 NeonFlow.Block = class Block {
-  constructor (name, tileCodename) {
-    this.x = 0;
-    this.y = 0;
-    this.width = 64;
-    this.height = 64;
+  constructor (name, tileCodename, width, height) {
+    this.name = name;
+    this.width = width || 64;
+    this.height = height || 64;
     this.tile = tileCodename;
     this.states = [];
     NeonFlow.Block.blocks[name] = this;
-  }
-
-  setCoordinates (x, y) {
-    this.x = x;
-    this.y = y;
   }
 
   setSize (width, height) {

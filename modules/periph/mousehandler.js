@@ -36,6 +36,7 @@ NeonFlow.MouseHandler = class MouseHandler {
             hitRegion instanceof NeonFlow.EllipseHitRegion &&
             hitRegion.width * Math.pow(hrx - ev.clientX, 2) + hitRegion.height * Math.pow(hry - ev.clientY, 2) <= 1
           ) {
+            // Condition : a^-2 * x^2 + b^-2 * y^2 <= 1(^2)
             hitRegion.action();
           }
         }

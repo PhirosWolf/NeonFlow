@@ -12,6 +12,7 @@ let NeonFlow = {
     'data/block',
     'data/camera',
     'data/hitregion',
+    'data/layer',
     'graphics/canvas',
     'graphics/gui',
     'graphics/tileset',

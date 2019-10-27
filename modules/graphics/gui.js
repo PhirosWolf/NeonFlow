@@ -4,8 +4,8 @@ NeonFlow.GUI = class GUI {
   constructor (name, tileCodename, width, height) {
     this.hitRegions = [];
     this.tileCodename = tileCodename;
-    this.width = width || 0;
-    this.height = height || 0;
+    this.width = width || 1;
+    this.height = height || 1;
     NeonFlow.GUI.GUIs[name] = this;
   }
 
