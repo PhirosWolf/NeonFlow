@@ -17,6 +17,7 @@ let isGuiActive = false;
 
 function load () {
   document.body.style.overflow = 'hidden';
+  document.body.style.margin = '0px';
   // Loads all modules
   NeonFlow.modulesDir = './../modules/';
   NeonFlow.import('*', main);

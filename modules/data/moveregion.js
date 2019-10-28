@@ -1,24 +1,26 @@
 'use strict';
 
-NeonFlow.HitRegion = class HitRegion {
-  constructor (name, action) {
+NeonFlow.MoveRegion = class MoveRegion {
+  constructor (name, action, xOffset, yOffset) {
     this.isActive = true;
     this.action = action;
     this.camera = null;
-    NeonFlow.HitRegion.hitRegions[name] = this;
+    this.xOffset = xOffset || 0;
+    this.yOffset = yOffset || 0;
+    NeonFlow.MoveRegion.moveRegions[name] = this;
   }
 
-  /* Activates the hit region */
+  /* Activates the move region */
   activate () {
     this.isActive = true;
   }
 
-  /* Deactivates the hit region */
+  /* Deactivates the move region */
   deactivate () {
     this.isActive = false;
   }
 
-  /* Toggles the hit region's activation status */
+  /* Toggles the move region's activation status */
   toggle () {
     this.isActive = !this.isActive;
   }
@@ -32,11 +34,16 @@ NeonFlow.HitRegion = class HitRegion {
   resetCamera () {
     this.camera = null;
   }
+
+  setOffset (x, y) {
+    this.xOffset = x;
+    this.yOffset = y;
+  }
 };
 
-NeonFlow.HitRegion.hitRegions = {};
+NeonFlow.MoveRegion.moveRegions = {};
 
-NeonFlow.RectHitRegion = class RectHitRegion extends NeonFlow.HitRegion {
+NeonFlow.RectMoveRegion = class RectMoveRegion extends NeonFlow.MoveRegion {
   constructor (name, x, y, width, height, action) {
     super(name, action);
     this.x = x;
@@ -46,16 +53,16 @@ NeonFlow.RectHitRegion = class RectHitRegion extends NeonFlow.HitRegion {
   }
 };
 
-NeonFlow.CircHitRegion = class CircHitRegion extends NeonFlow.HitRegion {
+NeonFlow.CircMoveRegion = class CircMoveRegion extends NeonFlow.MoveRegion {
   constructor (name, x, y, radius, action) {
     super(name, action);
     this.x = x;
     this.y = y;
     this.radius = radius;
   }
-};
+}
 
-NeonFlow.EllipseHitRegion = class EllipseHitRegion extends NeonFlow.HitRegion {
+NeonFlow.EllipseMoveRegion = class EllipseMoveRegion extends NeonFlow.MoveRegion {
   constructor (name, x, y, width, height, action) {
     super(name, action);
     this.x = x;
@@ -63,4 +70,4 @@ NeonFlow.EllipseHitRegion = class EllipseHitRegion extends NeonFlow.HitRegion {
     this.width = Math.pow(width, -2);
     this.height = Math.pow(height, -2);
   }
-};
+}

@@ -76,4 +76,58 @@ NeonFlow.MouseHandler = class MouseHandler {
   removeContextMenuActions () {
     this.contextMenuActions = [];
   }
+
+  static linkMoveRegion (moveRegionName) {
+
+  }
+
+  static unlinkMoveRegion (moveRegionName) {
+
+  }
+
+  static unlinkMoveRegions () {
+
+  }
+
+  static setMoveRegionOffset (x, y) {
+    NeonFlow.MouseHandler.moveRegionsXOffset = x;
+    NeonFlow.MouseHandler.moveRegionsYOffset = y;
+  }
 };
+
+NeonFlow.MouseHandler.moveRegionsXOffset = 0;
+NeonFlow.MouseHandler.moveRegionsYOffset = 0;
+NeonFlow.MouseHandler.moveRegions = [];
+NeonFlow.MouseHandler.lastMoveEvent = null;
+NeonFlow.MouseHandler.mouseMoveHandler = (ev) => {
+  NeonFlow.MouseHandler.lastMoveEvent = ev;
+  NeonFlow.MouseHandler.moveRegions.forEach((moveRegion) => {
+    let isCameraDefined = moveRegion.camera instanceof NeonFlow.Camera;
+    let xOffset = isCameraDefined ? moveRegion.camera.x : 0;
+    let yOffset = isCameraDefined ? moveRegion.camera.y : 0;
+    let mrx = moveRegion.x + moveRegion.xOffset - xOffset + NeonFlow.MouseHandler.moveRegionsXOffset;
+    let mry = moveRegion.y + moveRegion.yOffset - yOffset + NeonFlow.MouseHandler.moveRegionsYOffset;
+    if (moveRegion.isActive) {
+      if (
+        moveRegion instanceof NeonFlow.RectHitRegion &&
+        ev.clientX >= mrx &&
+        ev.clientY >= mry &&
+        ev.clientX <= mrx + moveRegion.width &&
+        ev.clientY <= mry + moveRegion.height
+      ) {
+        moveRegion.action();
+      } else if (
+        moveRegion instanceof NeonFlow.CircHitRegion &&
+        Math.pow(mrx - ev.clientX, 2) + Math.pow(mry - ev.clientY, 2) <= Math.pow(moveRegion.radius, 2)
+      ) {
+        moveRegion.action();
+      } else if (
+        moveRegion instanceof NeonFlow.EllipseHitRegion &&
+        moveRegion.width * Math.pow(mrx - ev.clientX, 2) + moveRegion.height * Math.pow(mry - ev.clientY, 2) <= 1
+      ) {
+        // Condition : a^-2 * x^2 + b^-2 * y^2 <= 1(^2)
+        moveRegion.action();
+      }
+    }
+  });
+}
