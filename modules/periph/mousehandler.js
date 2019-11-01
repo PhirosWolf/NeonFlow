@@ -59,7 +59,18 @@ NeonFlow.MouseHandler = class MouseHandler {
 
   /* Links a hit region to the mouse handler */
   linkHitRegion (hitRegionName) {
-    return this.hitRegions.push(NeonFlow.HitRegion.hitRegions[hitRegionName]) - 1;
+    let firstAvailableSpace = this.hitRegions.findIndex((el) => el === null);
+    if (firstAvailableSpace === -1) {
+      return this.hitRegions.push(NeonFlow.HitRegion.hitRegions[hitRegionName]) - 1;
+    } else {
+      this.hitRegions[firstAvailableSpace] = NeonFlow.HitRegion.hitRegions[hitRegionName];
+      return firstAvailableSpace;
+    }
+  }
+
+  /* Unlinks a single hit region */
+  unlinkHitRegion (hitRegionIndex) {
+    this.hitRegions[hitRegionIndex] = null;
   }
 
   /* Unlinks all hit regions*/
@@ -77,18 +88,28 @@ NeonFlow.MouseHandler = class MouseHandler {
     this.contextMenuActions = [];
   }
 
+  /* Links a move region */
   static linkMoveRegion (moveRegionName) {
-
+    let firstAvailableSpace = NeonFlow.MouseHandler.moveRegions.findIndex((el) => el === null);
+    if (firstAvailableSpace === -1) {
+      return NeonFlow.MouseHandler.moveRegions.push(NeonFlow.MoveRegion.moveRegions[moveRegionName]) - 1;
+    } else {
+      NeonFlow.MouseHandler.moveRegions[firstAvailableSpace] = NeonFlow.MoveRegion.moveRegions[moveRegionName];
+      return firstAvailableSpace;
+    }
   }
 
-  static unlinkMoveRegion (moveRegionName) {
-
+  /* Unlinks a single move region */
+  static unlinkMoveRegion (moveRegionIndex) {
+    NeonFlow.MouseHandler.moveRegions[moveRegionIndex] = null;
   }
 
+  /* Unlinks all move regions */
   static unlinkMoveRegions () {
-
+    NeonFlow.MouseHandler.moveRegions = [];
   }
 
+  /* Sets general move region offset */
   static setMoveRegionOffset (x, y) {
     NeonFlow.MouseHandler.moveRegionsXOffset = x;
     NeonFlow.MouseHandler.moveRegionsYOffset = y;
@@ -109,7 +130,7 @@ NeonFlow.MouseHandler.mouseMoveHandler = (ev) => {
     let mry = moveRegion.y + moveRegion.yOffset - yOffset + NeonFlow.MouseHandler.moveRegionsYOffset;
     if (moveRegion.isActive) {
       if (
-        moveRegion instanceof NeonFlow.RectHitRegion &&
+        moveRegion instanceof NeonFlow.RectMoveRegion &&
         ev.clientX >= mrx &&
         ev.clientY >= mry &&
         ev.clientX <= mrx + moveRegion.width &&
@@ -117,12 +138,12 @@ NeonFlow.MouseHandler.mouseMoveHandler = (ev) => {
       ) {
         moveRegion.action();
       } else if (
-        moveRegion instanceof NeonFlow.CircHitRegion &&
+        moveRegion instanceof NeonFlow.CircMoveRegion &&
         Math.pow(mrx - ev.clientX, 2) + Math.pow(mry - ev.clientY, 2) <= Math.pow(moveRegion.radius, 2)
       ) {
         moveRegion.action();
       } else if (
-        moveRegion instanceof NeonFlow.EllipseHitRegion &&
+        moveRegion instanceof NeonFlow.EllipseMoveRegion &&
         moveRegion.width * Math.pow(mrx - ev.clientX, 2) + moveRegion.height * Math.pow(mry - ev.clientY, 2) <= 1
       ) {
         // Condition : a^-2 * x^2 + b^-2 * y^2 <= 1(^2)
@@ -130,4 +151,6 @@ NeonFlow.MouseHandler.mouseMoveHandler = (ev) => {
       }
     }
   });
-}
+};
+
+document.body.addEventListener('mousemove', NeonFlow.MouseHandler.mouseMoveHandler);

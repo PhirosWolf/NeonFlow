@@ -14,6 +14,8 @@ NeonFlow.Canvas = class Canvas {
     this.canvas.height = height || window.innerHeight;
     this.canvas.setAttribute('class', 'neonflow-canvas');
     this.ctx = this.canvas.getContext('2d');
+    this.tileRotation = 0;
+    this.tileRotationUnit = 'deg';
   }
 
   /* Sets the canvas' size */
@@ -26,6 +28,17 @@ NeonFlow.Canvas = class Canvas {
   setFullscreenSize () {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+  }
+
+  /* Sets the tile rotation */
+  setTileRotation (angle, unit) {
+    angle = angle || 0;
+    this.tileRotationUnit = unit === 'deg' ? 'deg' : 'rad';
+    if (this.tileRotationUnit === 'deg') {
+      this.tileRotation = angle % 360;
+    } else {
+      this.tileRotation = angle % (2 * Math.PI);
+    }
   }
 
   /* Adds the canvas ater a given element (or after the last child of <body>) */
@@ -62,7 +75,20 @@ NeonFlow.Canvas = class Canvas {
       let isCameraDefined = this.camera instanceof NeonFlow.Camera;
       let xScale = isCameraDefined ? this.camera.scaleX : 1;
       let yScale = isCameraDefined ? this.camera.scaleY : 1;
-      this.ctx.drawImage(tileset.tileset, ...tile, x, y, width * xScale, height * yScale);
+      let translatedX = x + Math.round(width / 2);
+      let translatedY = y + Math.round(height / 2);
+      if (this.tileRotation !== 0) {
+        this.ctx.translate(translatedX, translatedY);
+        if (this.tileRotationUnit === 'rad') {
+          this.ctx.rotate(this.tileRotation);
+        } else {
+          this.ctx.rotate(this.tileRotation * Math.PI / 180);
+        }
+        this.ctx.drawImage(tileset.tileset, ...tile, x - translatedX, y - translatedY, width * xScale, height * yScale);
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      } else {
+        this.ctx.drawImage(tileset.tileset, ...tile, x, y, width * xScale, height * yScale);
+      }
     }
   }
 
@@ -81,17 +107,10 @@ NeonFlow.Canvas = class Canvas {
     let parsedBlockName = blockName.split(':');
     let blockState = parseInt(parsedBlockName[1] || 0);
     let block = NeonFlow.Block.blocks[parsedBlockName[0]];
-    let isCameraDefined = this.camera instanceof NeonFlow.Camera;
-    let xOffset = isCameraDefined ? this.camera.x : 0;
-    let yOffset = isCameraDefined ? this.camera.y : 0;
-    let xScale = isCameraDefined ? this.camera.scaleX : 1;
-    let yScale = isCameraDefined ? this.camera.scaleY : 1;
-    x = x - xOffset;
-    y = this.canvas.height - y + yOffset;
     width = width || block.width;
     height = height || block.width;
     let tile = !blockState ? block.tile : block.states[Math.abs(blockState) - 1];
-    this.drawTile(tile, x, y, width * xScale, height * yScale);
+    this.drawTileRelative(tile, x, y, width, height);
   }
 
   /* Draws a block with coordinates relative to the block's size */
@@ -99,17 +118,12 @@ NeonFlow.Canvas = class Canvas {
     let parsedBlockName = blockName.split(':');
     let blockState = parseInt(parsedBlockName[1] || 0);
     let block = NeonFlow.Block.blocks[parsedBlockName[0]];
-    let isCameraDefined = this.camera instanceof NeonFlow.Camera;
-    let xOffset = isCameraDefined ? this.camera.x : 0;
-    let yOffset = isCameraDefined ? this.camera.y : 0;
-    let xScale = isCameraDefined ? this.camera.scaleX : 1;
-    let yScale = isCameraDefined ? this.camera.scaleY : 1;
-    x = (x + 1) * width - xOffset;
-    y = this.canvas.height - (y + 1) * HEIGHT + yOffset;
+    x = x * width;
+    y = this.canvas.height - (y + 1) * height;
     width = width || block.width;
     height = height || block.width;
     let tile = !blockState ? block.tile : block.states[Math.abs(blockState) - 1];
-    this.drawTile(tile, x, y, width * xScale, height * yScale);
+    this.drawTileRelative(tile, x, y, width, height);
   }
 
   /* Draws a GUI */
@@ -196,11 +210,18 @@ NeonFlow.Canvas = class Canvas {
   }
 
   /* Draws a map */
-  drawMap (mapName) {
+  drawMap (mapName, tileWidth, tileHeight) {
+    let isCameraDefined  = this.camera instanceof NeonFlow.Camera;
+    let cameraX = isCameraDefined ? 0 : this.camera.x;
+    let cameraY = isCameraDefined ? 0 : this.camera.y;
     let map = NeonFlow.Map.maps[mapName];
+    tileWidth = tileWidth || map.blockWidth;
+    tileHeight = tileHeight || map.blockHeight;
+
+    /* O(n^2) */
     for (let i = 0; i < map.width; ++i) {
       for (let j = 0; j < map.height; ++j) {
-        map.getBlockAt(i, j);
+        this.drawBlockRelative(map.getBlockAt(i, j), i, j, tileWidth, tileHeight);
       }
     }
   }

@@ -6,7 +6,83 @@
 * Please don't use it as a reference x)
 */
 
+let tileset = null;
+let tilesetCube = null;
 let c = null;
+let camera = null;
+let map = null;
+let ready = 0;
+
+function load () {
+  document.body.style.overflow = 'hidden';
+  document.body.style.margin = '0px';
+  // Loads all modules
+  NeonFlow.modulesDir = './../modules/';
+  NeonFlow.import('*', main);
+}
+
+function main () {
+  c = new NeonFlow.Canvas();
+  c.setFullscreenSize();
+  c.addAfterElement();
+  tileset = new NeonFlow.Tileset('test', './../../tileset-test.png', registerTiles);
+  tilesetCube = new NeonFlow.Tileset('test2', './../../test.png', registerTiles2);
+  tileset.setTileSize(50, 50);
+  tileset.setOffset(10, 10);
+  tilesetCube.setTileSize(50, 50);
+}
+
+function registerTiles () {
+  tileset.registerTiles('part-$i');
+  tileset.registerTile('center', 25, 25, 50, 50);
+  ++ready;
+  ready === 2 ? then() : {};
+}
+
+function registerTiles2 () {
+  tilesetCube.registerTiles('$i');
+  tilesetCube.registerTile('center', 25, 25, 50, 50);
+  ++ready === 2 ? then() : {};
+}
+
+function then () {
+  camera = new NeonFlow.Camera('cam1');
+  c.setCamera('cam1');
+  let firstBlock = new NeonFlow.Block('first', 'test.part-0', 50, 50);
+  firstBlock.addState('test.part-1');
+  firstBlock.addState('test2.0');
+  let scndBlock = new NeonFlow.Block('scnd', 'test.part-2', 50, 50);
+  scndBlock.addState('test.part-3');
+  let air = new NeonFlow.Block('void', 'test.center', 50, 50);
+  map = new NeonFlow.Map('main', 100, 50);
+  map.setReferenceBlockSize(50, 50);
+  map.register('void', 0);
+  map.register('first:1', 1);
+  map.register('first:2', 2);
+  map.register('scnd', 3);
+  map.register('scnd:1', 4);
+  map.setIdAt(2, 0, 0);
+  map.setIdAt(2, 10, 10);
+  map.setIdAt(2, 20, 20);
+  map.setIdAt(2, 30, 30);
+  map.setIdAt(3, 10, 0);
+  map.setIdAt(3, 99, 0);
+  map.setRegion(2, 2, map.getRegion(10, 0, 10, 10));
+  // let rot = 0;
+  // setInterval(() => {
+    c.clear();
+    camera.moveBy(10, -10);
+    console.log(map.getRegion(Math.floor(camera.x / map.blockWidth), Math.floor(camera.y / map.blockHeight) + 1, Math.ceil(c.canvas.width / map.blockWidth), Math.ceil(c.canvas.height / map.blockHeight)));
+    // ++rot;
+    // c.setTileRotation(90 * Math.sin(rot / 100), 'deg');
+    // c.setTileRotation(90 * Math.sin(rot / 10), 'deg');
+    c.drawMap('main');
+  // }, 10);
+}
+
+load();
+
+/*let c = null;
 let ready = 0;
 let darkBgLayer = null;
 let blocksLayer = null;
@@ -99,7 +175,7 @@ function runtime () {
   }, 33); // ~30fps
 }
 
-load();
+load();*/
 
 /*'use strict';
 
