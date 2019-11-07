@@ -22,7 +22,12 @@ let NeonFlow = {
     'toolkits/graphics'
   ],
   /* Checks if the given array of modules are already imported */
-  'chkDep': (deps) => deps.every((dep) => NeonFlow.modules.includes(dep)),
+  'chkDep': (deps) => {
+    let notImportedModules = deps.filter((dep) => !NeonFlow.modules.includes(dep));
+    if (notImportedModules.length !== 0) {
+      throw new Error(`Module(s) ${notImportedModules.join(', ')} are not imported.`);
+    }
+  },
   'import': (query, callback) => {
     /* Count the number of scripts which are fully loaded */
     let queriesDoneCount = 0;

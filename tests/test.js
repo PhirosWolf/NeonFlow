@@ -71,8 +71,9 @@ function then () {
   // let rot = 0;
   // setInterval(() => {
     c.clear();
-    camera.moveBy(10, -10);
-    console.log(map.getRegion(Math.floor(camera.x / map.blockWidth), Math.floor(camera.y / map.blockHeight) + 1, Math.ceil(c.canvas.width / map.blockWidth), Math.ceil(c.canvas.height / map.blockHeight)));
+    camera.moveBy(49, -49);
+    // console.log(4, map.getViewedRegion('cam1', c.canvas.width, c.canvas.height).length, map.getViewedRegion('cam1', c.canvas.width, c.canvas.height)[0].length);
+    // console.log(map.getViewedRegion('cam1'));
     // ++rot;
     // c.setTileRotation(90 * Math.sin(rot / 100), 'deg');
     // c.setTileRotation(90 * Math.sin(rot / 10), 'deg');

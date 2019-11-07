@@ -2,6 +2,7 @@
 
 NeonFlow.Tileset = class Tileset {
   constructor (name, path, callback) {
+    NeonFlow.chkDep(['toolkits/graphics']);
     this.tileset = null;
     this.tileWidth = 64;
     this.tileHeight = 64;

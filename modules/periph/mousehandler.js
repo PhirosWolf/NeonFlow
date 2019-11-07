@@ -2,6 +2,7 @@
 
 NeonFlow.MouseHandler = class MouseHandler {
   constructor (elem, xOffset, yOffset) {
+    NeonFlow.chkDep(['data/camera', 'data/hitregion']);
     this.elemBoundaries = elem.getBoundingClientRect();
     this.lastClickEvent = null;
     this.lastContextMenuEvent = null;
@@ -59,6 +60,7 @@ NeonFlow.MouseHandler = class MouseHandler {
 
   /* Links a hit region to the mouse handler */
   linkHitRegion (hitRegionName) {
+    NeonFlow.chkDep(['data/hitregion']);
     let firstAvailableSpace = this.hitRegions.findIndex((el) => el === null);
     if (firstAvailableSpace === -1) {
       return this.hitRegions.push(NeonFlow.HitRegion.hitRegions[hitRegionName]) - 1;
@@ -90,6 +92,7 @@ NeonFlow.MouseHandler = class MouseHandler {
 
   /* Links a move region */
   static linkMoveRegion (moveRegionName) {
+    NeonFlow.chkDep(['data/moveregion']);
     let firstAvailableSpace = NeonFlow.MouseHandler.moveRegions.findIndex((el) => el === null);
     if (firstAvailableSpace === -1) {
       return NeonFlow.MouseHandler.moveRegions.push(NeonFlow.MoveRegion.moveRegions[moveRegionName]) - 1;
@@ -123,6 +126,7 @@ NeonFlow.MouseHandler.lastMoveEvent = null;
 NeonFlow.MouseHandler.mouseMoveHandler = (ev) => {
   NeonFlow.MouseHandler.lastMoveEvent = ev;
   NeonFlow.MouseHandler.moveRegions.forEach((moveRegion) => {
+    NeonFlow.chkDep(['data/camera', 'data/moveregion']);
     let isCameraDefined = moveRegion.camera instanceof NeonFlow.Camera;
     let xOffset = isCameraDefined ? moveRegion.camera.x : 0;
     let yOffset = isCameraDefined ? moveRegion.camera.y : 0;

@@ -25,6 +25,7 @@ NeonFlow.HitRegion = class HitRegion {
 
   /* Sets a camera */
   setCamera (cameraName) {
+    NeonFlow.chkDep(['data/camera']);
     this.camera = NeonFlow.Camera.cameras[cameraName];
   }
 

@@ -27,6 +27,7 @@ NeonFlow.MoveRegion = class MoveRegion {
 
   /* Sets a camera */
   setCamera (cameraName) {
+    NeonFlow.chkDep(['data/camera']);
     this.camera = NeonFlow.Camera.cameras[cameraName];
   }
 
