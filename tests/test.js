@@ -12,6 +12,7 @@ let c = null;
 let camera = null;
 let map = null;
 let ready = 0;
+let qtree;
 
 function load () {
   document.body.style.overflow = 'hidden';
@@ -68,10 +69,19 @@ function then () {
   map.setIdAt(3, 10, 0);
   map.setIdAt(3, 99, 0);
   map.setRegion(2, 2, map.getRegion(10, 0, 10, 10));
+
+  qtree = new NeonFlow.NeonCD.QuadTree(0, 0, 123, 123, 4);
+  qtree.addNode(new NeonFlow.NeonCD.Node(10, 10));
+  qtree.addNode(new NeonFlow.NeonCD.Node(10, 10));
+  qtree.addNode(new NeonFlow.NeonCD.Node(20, 20));
+  qtree.addNode(new NeonFlow.NeonCD.Node(30, 30));
+  qtree.addNode(new NeonFlow.NeonCD.Node(61, 61));
+  qtree.addNode(new NeonFlow.NeonCD.Node(70, 10));
+
   // let rot = 0;
   // setInterval(() => {
     c.clear();
-    camera.moveBy(49, -49);
+    // camera.moveBy(49, -49);
     // console.log(4, map.getViewedRegion('cam1', c.canvas.width, c.canvas.height).length, map.getViewedRegion('cam1', c.canvas.width, c.canvas.height)[0].length);
     // console.log(map.getViewedRegion('cam1'));
     // ++rot;

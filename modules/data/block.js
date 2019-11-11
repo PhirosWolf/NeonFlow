@@ -6,6 +6,7 @@ NeonFlow.Block = class Block {
     this.width = width || 64;
     this.height = height || 64;
     this.tile = tileCodename;
+    this.hitbox = null;
     this.states = [];
     NeonFlow.Block.blocks[name] = this;
   }
@@ -29,6 +30,15 @@ NeonFlow.Block = class Block {
 
   setState (n, tileCodename) {
     this.states[n] = tileCodename;
+  }
+
+  setHitbox (hitbox) {
+    NeonFlow.chkDep(['data/neoncd']);
+    this.hitbox = hitbox || new NeonFlow.NeonCD.Hitbox(0, 0, this.width, this.height);
+  }
+
+  removeHitbox (hitbox) {
+    this.hitbox = null;
   }
 };
 

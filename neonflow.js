@@ -15,10 +15,12 @@ let NeonFlow = {
     'data/layer',
     'data/map',
     'data/moveregion',
+    'data/neoncd',
     'graphics/canvas',
     'graphics/gui',
     'graphics/tileset',
     'periph/mousehandler',
+    'toolkits/data',
     'toolkits/graphics'
   ],
   /* Checks if the given array of modules are already imported */

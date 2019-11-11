@@ -1,5 +1,6 @@
 'use strict';
 
+/* GTK stands for Graphics ToolKit */
 NeonFlow.GTK = {
   /* Loads an image using Fetch API */
   'loadImage': (path, callback) => {
