@@ -13,6 +13,7 @@ let camera = null;
 let map = null;
 let ready = 0;
 let qtree;
+let nodes;
 
 function load () {
   document.body.style.overflow = 'hidden';
@@ -71,11 +72,19 @@ function then () {
   map.setRegion(2, 2, map.getRegion(10, 0, 10, 10));
 
   qtree = new NeonFlow.NeonCD.QuadTree(0, 0, 123, 123, 4);
-  qtree.addNode(new NeonFlow.NeonCD.Node(10, 10));
-  qtree.addNode(new NeonFlow.NeonCD.Node(10, 10));
-  qtree.addNode(new NeonFlow.NeonCD.Node(20, 20));
-  qtree.addNode(new NeonFlow.NeonCD.Node(30, 30));
-  qtree.addNode(new NeonFlow.NeonCD.Node(61, 61));
+  nodes = [
+    new NeonFlow.NeonCD.Node(10, 10),
+    new NeonFlow.NeonCD.Node(20, 20),
+    new NeonFlow.NeonCD.Node(30, 30),
+    new NeonFlow.NeonCD.Node(61, 61)
+  ];
+  nodes[0].addPointer(nodes[1]);
+  nodes[0].addPointer(nodes[2]);
+  nodes[1].addPointer(nodes[3]);
+  /*new NeonFlow.NeonCD.Link('first', nodes[0], nodes[1]);
+  new NeonFlow.NeonCD.Link('scnd', nodes[1], nodes[2]);
+  new NeonFlow.NeonCD.Link('third', nodes[2], nodes[3]);*/
+  qtree.addNodes(...nodes);
   qtree.addNode(new NeonFlow.NeonCD.Node(70, 10));
 
   // let rot = 0;

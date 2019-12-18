@@ -60,6 +60,7 @@ NeonFlow.Map = class Map {
     return this.map.slice(x, x + width).map((slice) => slice.slice(this.height - y - height, this.height - y).reverse());
   }
 
+  /* Sets the block's generic size */
   setReferenceBlockSize (width, height) {
     this.blockWidth = width || 64;
     this.blockHeight = height || 64;

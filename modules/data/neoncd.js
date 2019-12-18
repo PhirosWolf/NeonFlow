@@ -1,9 +1,22 @@
 'use strict';
 
+/**
+* TODO :
+* - Links / pointers between nodes
+* - QuadTree's support of linked/pointed nodes
+* - Hitboxes support /!\ Might produce floating-points numbers /!\
+**/
+
 /* NeonCD stands for NeonFlow Collision Detector */
 NeonFlow.NeonCD = class NeonCD {
-  constructor (...hitboxes) {
+  constructor (x, y, width, height, quadTreeCapacity, predictCollisions, ...hitboxes) {
+    this.x = x || 0;
+    this.y = y || 0;
+    this.width = width === undefined ? 256 : width;
+    this.height = height === undefined ? 256 : height;
     this.hitboxes = hitboxes;
+    this.quadTree = new NeonFlow.NeonCD.QuadTree(this.x, this.y, this.width, this.height, quadTreeCapacity);
+    this.predictCollisions = predictCollisions === undefined ? true : predictCollisions;
   }
 
   fromMap (mapName) {
@@ -11,17 +24,20 @@ NeonFlow.NeonCD = class NeonCD {
     let map = NeonFlow.Map.maps[mapName];
     for (let i = 0; i < map.map.length; ++i) {
       for (let j = 0; j < map.map[0].length; ++j) {
-
+        let hb = map.getBlockAt(i, j).hitbox;
+        if (hb !== null) {
+          this.quadTree.addNodes(...hb.nodes);
+        }
       }
     }
   }
 };
 
 NeonFlow.NeonCD.Node = class Node {
-  constructor (x, y, links) {
+  constructor (x, y, pointers) {
     this.x = x || 0;
     this.y = y || 0;
-    this.links = links || [];
+    this.pointers = pointers || [];
   }
 
   /* Sets coordinates of the node */
@@ -30,96 +46,57 @@ NeonFlow.NeonCD.Node = class Node {
     this.y = y || 0;
   }
 
-  /* Sets the links of the node */
-  setLinks (links) {
-    this.links = links || [];
-  }
-
-  /* Adds a link */
-  addLink (link) {
-    let availableSpace = this.links.findIndex((el) => el === null);
-    if (availableSpace === -1) {
-      return this.links.push(link) - 1;
+  /* Adds a pointer to the node */
+  addPointer (pointedNode) {
+    let availablePos = this.pointers.findIndex((el) => el === null);
+    if (availablePos === -1) {
+      return this.pointers.push(pointedNode) - 1;
     } else {
-      this.links[availableSpace] = link;
-      return availableSpace;
+      this.pointers[availablePos] = pointedNode;
+      return pointedNode;
     }
   }
 
-  /* Removes a link */
-  removeLink (index) {
-    this.links[index] = null;
+  /* Adds multiple pointers */
+  addPointers (...pointedNodes) {
+    let positions = [];
+    pointedNodes.forEach((node) => {
+      positions.push(this.addPointer(node));
+    });
+    return positions;
   }
 
-  /* Removes a link by looking at its name */
-  removeLinkByName (name) {
-    this.removeLink(this.links.findIndex((link) => link.name === name));
+  /* Removes a pointer */
+  removePointer (index) {
+    this.pointers[index] = null;
   }
 
-  /* Removes all links */
-  removeLinks () {
-    this.links = [];
-  }
-};
-
-NeonFlow.NeonCD.Link = class Link {
-  constructor (name, nodeA, nodeB, autoAdd) {
-    this.autoAdd = autoAdd === undefined ? true : autoAdd;
-    this.name = name;
-    this.nodeA = nodeA;
-    this.nodeB = nodeB;
-    if (this.autoAdd) {
-      this.nodeA.addLink(this.name);
-      this.nodeB.addLink(this.name);
-    }
-    NeonFlow.NeonCD.Link.links[name] = this;
+  /* Removes all pointers */
+  removePointers () {
+    this.pointers = [];
   }
 
-  /* Sets the first node of the link */
-  setNodeA (point) {
-    if (this.autoAdd) {
-      this.nodeA.removeLinkByName(this.name);
+  /* Returns all pointed nodes given a relation degree */
+  getPointedNodes (relationDegree) {
+    relationDegree = relationDegree === undefined ? 1 : relationDegree;
+    if (relationDegree < 1) {
+      return [];
     }
-    this.nodeA = point;
-    if (this.autoAdd) {
-      this.nodeA.addLink(this.name);
+    let result = [...this.pointers];
+    if (relationDegree != 1) {
+      this.pointers.forEach((pointedNode) => {
+        result.push(...pointedNode.getPointedNodes(relationDegree - 1));
+      });
     }
-  }
-
-  /* Sets the second node of the link */
-  setNodeB (point) {
-    if (this.autoAdd) {
-      this.nodeB.removeLinkByName(this.name);
-    }
-    this.nodeB = point;
-    if (this.autoAdd) {
-      this.nodeB.addLink(this.name);
-    }
-  }
-
-  /* Sets both nodes */
-  setNodes (nodeA, nodeB) {
-    if (this.autoAdd) {
-      this.nodeA.removeLinkByName(this.name);
-    }
-    this.nodeA = point;
-    if (this.autoAdd) {
-      this.nodeA.addLink(this.name);
-      this.nodeB.removeLinkByName(this.name);
-    }
-    this.nodeB = point;
-    if (this.autoAdd) {
-      this.nodeB.addLink(this.name);
-    }
+    return result;
   }
 };
-
-NeonFlow.NeonCD.Link.links = {};
 
 NeonFlow.NeonCD.Hitbox = class Hitbox {
   constructor (sourceX, sourceY, ...nodes) {
     /* Coordinates are relative to the top left corner of the tileset */
     this.nodes = [sourceX || 0, sourceY || 0, ...nodes];
+    this.refPoint = []; // NOTE: this point is used to know where the "inside" part of the hitbox is
   }
 
   /* Sets hitbox first node's coordinates */
@@ -148,6 +125,21 @@ NeonFlow.NeonCD.Hitbox = class Hitbox {
   setNodes (...nodes) {
     this.nodes = [this.nodes[0], this.nodes[1], ...nodes];
   }
+
+  setRefPoint (x, y) {
+    this.refPoint = [x || 0, y || 0];
+  }
+
+  autoSetRefPoint () {
+    // TODO
+  }
+
+  contains (x, y) {
+    /*for (let i = 0; i < this.nodes.length; ++i) {
+
+    }*/
+
+  }
 };
 
 NeonFlow.NeonCD.QuadTree = class QuadTree {
@@ -165,6 +157,7 @@ NeonFlow.NeonCD.QuadTree = class QuadTree {
     this.zones = [];
   }
 
+  /* Checks if the QuadTree must be divided */
   checkForDivision () {
     if (!this.isDivided && this.nodes.length > this.capacity && this.halfWidth > 0 && this.halfHeight > 0) {
       if (this.halfWidth === 1 && this.halfHeight === 1) {
@@ -195,12 +188,14 @@ NeonFlow.NeonCD.QuadTree = class QuadTree {
     }
   }
 
+  /* Checks if the QuadTree contains the given coordinates */
   contains (x, y) {
     x = x || 0;
     y = y || 0;
     return x >= this.x && x < this.x + this.width && y >= this.y && y < this.y + this.height;
   }
 
+  /* Adds a node */
   addNode (node) {
     if (this.contains(node.x, node.y)) {
       if (this.isDivided) {
@@ -214,6 +209,14 @@ NeonFlow.NeonCD.QuadTree = class QuadTree {
     }
   }
 
+  /* Adds multiple nodes */
+  addNodes (...nodes) {
+    nodes.forEach((node) => {
+      this.addNode(node);
+    });
+  }
+
+  /* Query a given part of the QuadTree */
   query (x, y, width, height) {
     x = x || 0;
     y = y || 0;
@@ -246,36 +249,23 @@ NeonFlow.NeonCD.QuadTree = class QuadTree {
     return result;
   }
 
-  // TODO
-  queryWithLinks (x, y, width, height, degreeOfRelation) {
-    /*x = x || 0;
-    y = y || 0;
-    width = width === undefined ? this.width : width;
-    height = height === undefined ? this.height : height;
-    let result = [];
-    if (
-      x + width >= this.x &&
-      y + height >= this.y &&
-      x <= this.x + this.width &&
-      y <= this.y + this.height
-    ) {
-      if (this.isDivided) {
-        this.zones.forEach((zone) => {
-          result.push(...zone.query(x, y, width, height));
-        });
-      } else {
-        this.nodes.forEach((node) => {
-          if (
-            node.x >= x &&
-            node.y >= y &&
-            node.x <= x + width &&
-            node.y <= y + height
-          ) {
-            result.push(node);
-          }
-        });
-      }
-    }
-    return result;*/
+  /* Query a given part of the QuadTree including pointed nodes given a relation degree */
+  queryWithPointers (x, y, width, height, relationDegree) {
+    let query = this.query(x, y, width, height);
+    let result = [...query];
+    query.forEach((node) => {
+      result.push(...node.getPointedNodes(relationDegree));
+    });
+    return result;
+  }
+
+  /* Same as queryWithPointers but with a limit square */
+  queryWithLimitPointers (x, y, width, height, limitX, limitY, limitWidth, limitHeight, relationDegree) {
+    let query = this.query(x, y, width, height);
+    let result = [...query];
+    query.forEach((node) => {
+      result.push(...node.getPointedNodes(relationDegree).filter((pointee) => pointee.x >= limitX && pointee.x <= limitX + limitWidth && pointee.y >= limitY && pointee.y <= limitY + limitHeight));
+    });
+    return result;
   }
 };
